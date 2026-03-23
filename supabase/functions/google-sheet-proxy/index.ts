@@ -6,7 +6,7 @@ const corsHeaders = {
 };
 
 // Target Google Apps Script web app URL
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-9yIobvN3R3vjMcdLrviYopald_7ad1ULk7FqzUw-MJ9YHi_0dvIug4yb-v1cGMSviA/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6jkFClI9n1TQNWINhI1rkDi2pT07dYOqmiywy7iJr5tYp--tqpQw61X5KMWXiPlYTUg/exec";
 
 serve(async (req) => {
   // Handle CORS preflight requests natively

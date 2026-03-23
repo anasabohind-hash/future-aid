@@ -50,7 +50,7 @@ export default function Index() {
       });
       if (error) throw error;
       if (Array.isArray(rows)) {
-        return rows.some((row: string[]) => row[1] === extracted.link);
+        return rows.some((row: string[]) => row[3] === extracted.link);
       }
       return false;
     } catch (e) {
