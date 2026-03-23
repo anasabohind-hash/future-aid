@@ -4,7 +4,7 @@ import { StepSelect } from "@/components/StepSelect";
 import { StepPaste } from "@/components/StepPaste";
 import { StepExtracted } from "@/components/StepExtracted";
 import { StepReview } from "@/components/StepReview";
-import { SHEET_TABS, SHEET_URL, APPS_SCRIPT_URL } from "@/lib/constants";
+import { SHEET_TABS, SHEET_URL } from "@/lib/constants";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ExternalLink } from "lucide-react";
@@ -42,13 +42,19 @@ export default function Index() {
   }, [rawText]);
 
   const checkDuplicate = useCallback(async () => {
-    if (!APPS_SCRIPT_URL || !extracted.link) return false;
+    if (!extracted.link) return false;
     try {
       const sheetName = SHEET_TABS.find((t) => t.id === selectedTab)?.sheet || "";
-      const res = await fetch(`${APPS_SCRIPT_URL}?sheet=${encodeURIComponent(sheetName)}`);
-      const rows: string[][] = await res.json();
-      return rows.some((row) => row[1] === extracted.link);
-    } catch {
+      const { data: rows, error } = await supabase.functions.invoke("google-sheet-proxy", {
+        body: { action: "getRows", sheet: sheetName },
+      });
+      if (error) throw error;
+      if (Array.isArray(rows)) {
+        return rows.some((row: string[]) => row[1] === extracted.link);
+      }
+      return false;
+    } catch (e) {
+      console.error("Duplicate check failed:", e);
       return false;
     }
   }, [selectedTab, extracted.link]);
@@ -60,14 +66,6 @@ export default function Index() {
   }, [checkDuplicate]);
 
   const handleSubmit = useCallback(async () => {
-    if (!APPS_SCRIPT_URL) {
-      toast({
-        title: "Apps Script URL not set",
-        description: "Please deploy the Google Apps Script and set the URL in src/lib/constants.ts",
-        variant: "destructive",
-      });
-      return;
-    }
     setIsSubmitting(true);
     const sheetName = SHEET_TABS.find((t) => t.id === selectedTab)?.sheet || "";
     const payload: OpportunityData = {
@@ -79,12 +77,11 @@ export default function Index() {
       status: "Not Yet",
     };
     try {
-      const res = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sheet: sheetName, data: payload }),
+      const { data, error } = await supabase.functions.invoke("google-sheet-proxy", {
+        body: { action: "appendRow", sheet: sheetName, data: payload },
       });
-      if (!res.ok) throw new Error("Failed to append");
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       toast({
         title: "✅ Saved!",
         description: "Opportunity added to your sheet.",
