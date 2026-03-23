@@ -18,4 +18,4 @@ export const SPREADSHEET_ID = "1I3O0QiVVHQj_kkwqGEuFwZ0UYTfpJIaYQKcKSD_6UrY";
 export const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit`;
 
 // Replace this with your deployed Google Apps Script web app URL
-export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1K_q9nqTxUzFEoRBmFKiFVBNV0ead2fjpASnqFJKzTMF0J3O4LN-_sWh7g94FOfn35w/exec";
+export const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-9yIobvN3R3vjMcdLrviYopald_7ad1ULk7FqzUw-MJ9YHi_0dvIug4yb-v1cGMSviA/exec";
